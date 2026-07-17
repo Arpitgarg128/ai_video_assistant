@@ -12,25 +12,26 @@ def download_youtube_audio(url: str) -> str:
         "format": "bestaudio/best",
         "outtmpl": output_path,
         "postprocessors": [
-            {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "wav",
-                "preferredquality": "192",
-            }
+            {"key": "FFmpegExtractAudio", "preferredcodec": "wav", "preferredquality": "192"}
         ],
         "quiet": True,
-        "extractor_args": {
-            "youtube": {"player_client": ["android", "web"]}
-        },
+        "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
         "http_headers": {
             "User-Agent": "com.google.android.youtube/19.09.37 (Linux; U; Android 14) gzip"
         },
+        "impersonate": "chrome",
     }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        filename = ydl.prepare_filename(info)
-        base, _ = os.path.splitext(filename)
-        return base + ".wav"
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            filename = ydl.prepare_filename(info)
+            base, _ = os.path.splitext(filename)
+            return base + ".wav"
+    except yt_dlp.utils.DownloadError as e:
+        raise RuntimeError(
+            "Couldn't download this video — YouTube may be blocking cloud servers "
+            "for this particular video. Try a different video or upload a file directly."
+        ) from e
 
 
 def convert_to_wav(input_path: str) -> str:
