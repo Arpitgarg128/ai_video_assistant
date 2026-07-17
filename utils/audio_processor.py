@@ -6,7 +6,7 @@ DOWNLOAD_DIR ='downloads'
 
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-def download_youtube_audio(url :str) ->str:
+def download_youtube_audio(url: str) -> str:
     output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
     ydl_opts = {
         "format": "bestaudio/best",
@@ -19,11 +19,18 @@ def download_youtube_audio(url :str) ->str:
             }
         ],
         "quiet": True,
+        "extractor_args": {
+            "youtube": {"player_client": ["android", "web"]}
+        },
+        "http_headers": {
+            "User-Agent": "com.google.android.youtube/19.09.37 (Linux; U; Android 14) gzip"
+        },
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
-        filename = ydl.prepare_filename(info).replace(".webm", ".wav").replace(".m4a", ".wav")
-    return filename
+        filename = ydl.prepare_filename(info)
+        base, _ = os.path.splitext(filename)
+        return base + ".wav"
 
 
 def convert_to_wav(input_path: str) -> str:
