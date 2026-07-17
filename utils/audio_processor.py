@@ -1,4 +1,5 @@
 import yt_dlp
+from yt_dlp.networking.impersonate import ImpersonateTarget
 from pydub import AudioSegment
 import os
 
@@ -19,7 +20,7 @@ def download_youtube_audio(url: str) -> str:
         "http_headers": {
             "User-Agent": "com.google.android.youtube/19.09.37 (Linux; U; Android 14) gzip"
         },
-        "impersonate": "chrome",
+        "impersonate": ImpersonateTarget("chrome"),
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
