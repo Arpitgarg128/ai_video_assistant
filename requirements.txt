@@ -46,3 +46,4 @@ numpy<2.0.0
 tqdm>=4.66.0                      # Progress bars
 requests>=2.32.0
 langchain-chroma>=0.1.0
+curl_cffi>=0.7.0
