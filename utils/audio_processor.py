@@ -16,11 +16,12 @@ def download_youtube_audio(url: str) -> str:
             {"key": "FFmpegExtractAudio", "preferredcodec": "wav", "preferredquality": "192"}
         ],
         "quiet": True,
-        "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+        "extractor_args": {"youtube": {"player_client": ["android", "web", "tv"]}},
         "http_headers": {
             "User-Agent": "com.google.android.youtube/19.09.37 (Linux; U; Android 14) gzip"
         },
-        "impersonate": ImpersonateTarget("chrome"),
+        "retries": 3,
+        "socket_timeout": 30,
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -30,8 +31,9 @@ def download_youtube_audio(url: str) -> str:
             return base + ".wav"
     except yt_dlp.utils.DownloadError as e:
         raise RuntimeError(
-            "Couldn't download this video — YouTube may be blocking cloud servers "
-            "for this particular video. Try a different video or upload a file directly."
+            "This video couldn't be downloaded — YouTube sometimes blocks "
+            "requests from cloud servers. Please try the 'Upload Video' "
+            "option instead, or try a different YouTube link."
         ) from e
 
 
