@@ -1,3 +1,7 @@
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 import os
 import tempfile
 import streamlit as st
@@ -100,16 +104,25 @@ if st.button("🚀 Process"):
         st.stop()
 
     progress = st.progress(0)
-
     status = st.empty()
 
     status.text("Downloading / Extracting Audio...")
     progress.progress(15)
 
-    result = run_pipeline(source, language)
+    try:
+        result = run_pipeline(source, language)
+    except RuntimeError as e:
+        progress.empty()
+        status.empty()
+        st.error(str(e))
+        st.stop()
+    except Exception as e:
+        progress.empty()
+        status.empty()
+        st.error(f"Something went wrong while processing: {e}")
+        st.stop()
 
     progress.progress(100)
-
     status.success("Completed!")
 
     st.session_state.result = result
